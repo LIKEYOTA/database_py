@@ -5,7 +5,11 @@ import numpy as np
 import sys
 import os
 import test6
-
+import get_index
+'''
+change by likeyota
+time: 2018/3/5-20:31
+'''
 
 '''part 0'''
 # The comment
@@ -334,7 +338,7 @@ def create_index_table():
 
 
 # using
-def insert_index_names(table):
+def insert_index_names1(table):
     names = get_name(table)
     '''
     sql = "insert into %s(NP, MDD, PpT, TT, ShR, Days, " \
@@ -352,6 +356,46 @@ def insert_index_names(table):
                                                                            val[0], val[0], val[0], val[0])
         print sql
 
+# using for insert
+def insert_index_names(table, message):
+    names = get_name(table, message)
+    '''
+    sql = "insert into %s(NP, MDD, PpT, TT, ShR, Days, " \
+          "D_WR, D_STD, D_MaxNP, D_MinNP, maxW_Days, maxL_Days, mDD_mC, mDD_iC)" \
+          "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+    '''
+    print names
+    num = 0
+
+    for name in names:
+        t1 = time.time()
+        val = get_index.get_index14(name)  # get the index of table name
+        # val = []
+        t3 = time.time()
+        print 'single 1 time:\t', (t3 - t1)
+        sql = "insert into "+table+"(NP, MDD, PpT, TT, ShR, Days, " \
+              "D_WR, D_STD, D_MaxNP, D_MinNP, maxW_Days, maxL_Days, mDD_mC, mDD_iC)" \
+              "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)" % (
+              val[0], val[0], val[0], val[0], val[0], \
+              val[0], val[0], val[0], val[0], val[0], \
+              val[0], val[0], val[0], val[0])
+        sql1 = "update "+table+" set NP=%s, MDD=%s, PpT=%s, TT=%s, ShR=%s, Days=%s, D_WR=%s, D_STD=%s, D_MaxNP=%s," \
+                               " D_MinNP=%s, maxW_Days=%s, maxL_Days=%s, mDD_mC=%s, mDD_iC=%s where name='%s'" % (
+              val[0], val[1], val[2], val[3], val[4], \
+              val[5], val[6], val[7], val[8], val[9], \
+              val[10], val[11], val[12], val[13], name)
+
+        conn = connect_database(message)
+        cursor = conn.cursor()
+        cursor.execute(sql1)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        t2 = time.time()
+        print "num: %d\t" % num, (t2 - t1)
+
+        print sql1
+        num += 1
 
 # just test
 def insert_values(values, table_name):
